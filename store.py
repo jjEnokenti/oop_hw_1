@@ -5,15 +5,14 @@ class Store(Storage):
 
     def __init__(self, items: dict, capacity: int = 100):
         self._items: dict = items
-        self._capacity: int = capacity - sum(self._items.values())
+        self._capacity: int = capacity
 
     def add(self, title, quantity):
-        if self._capacity == 0:
+        if self.get_free_space() == 0:
             return False
-        if not self._capacity - quantity > 0:
-            quantity = self._capacity
+        if not self.get_free_space() - quantity > 0:
+            quantity = self.get_free_space()
 
-        self._capacity -= quantity
         self._items[title] = self._items.get(title, 0) + quantity
         return True
 
@@ -24,11 +23,13 @@ class Store(Storage):
         if quantity > current_quantity:
             quantity = current_quantity
         self._items[title] -= quantity
-        self._capacity += quantity
         return True
 
     def get_free_space(self):
-        return self._capacity
+        curr_space = 0
+        for quantity in self._items.values():
+            curr_space += quantity
+        return self._capacity - curr_space
 
     def get_items(self):
         return self._items
