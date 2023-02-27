@@ -23,6 +23,8 @@ class Store(Storage):
         if quantity > current_quantity:
             quantity = current_quantity
         self._items[title] -= quantity
+        if self._items[title] == 0:
+            self._items.pop(title)
         return True
 
     def get_free_space(self):
@@ -66,6 +68,6 @@ if __name__ == '__main__':
     assert st.get_free_space() == 0
 
     assert st.remove('asd', 3)
-    assert st.get_unique_items_count() == 6
+    assert st.get_unique_items_count() == 5
     assert st.get_free_space() == 3
 
