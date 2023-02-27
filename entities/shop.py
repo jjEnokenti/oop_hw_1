@@ -1,4 +1,4 @@
-from reps.base_storage import BaseStorage
+from entities.reps.base_storage import BaseStorage
 
 
 class Shop(BaseStorage):
