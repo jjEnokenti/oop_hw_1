@@ -1,9 +1,9 @@
-from reps.storage_rep import Storage
+from entities.reps.abstract_storage import AbstractStorage
 
 
-class Store(Storage):
+class BaseStorage(AbstractStorage):
 
-    def __init__(self, items: dict, capacity: int = 100):
+    def __init__(self, items: dict, capacity: int):
         self._items: dict = items
         self._capacity: int = capacity
 
@@ -22,6 +22,7 @@ class Store(Storage):
         current_quantity = self._items[title]
         if quantity > current_quantity:
             quantity = current_quantity
+
         self._items[title] -= quantity
         if self._items[title] == 0:
             self._items.pop(title)
@@ -38,36 +39,3 @@ class Store(Storage):
 
     def get_unique_items_count(self):
         return len(self._items)
-
-
-if __name__ == '__main__':
-    st = Store({'toy': 89, 'raat': 1})
-
-    assert st.get_unique_items_count() == 2
-    assert isinstance(st.get_items(), dict)
-    assert st.get_free_space() == 10
-
-    assert st.add('car', 5)
-    assert st.get_unique_items_count() == 3
-    assert st.get_free_space() == 5
-
-    assert st.add('das', 1)
-    assert st.get_unique_items_count() == 4
-    assert st.get_free_space() == 4
-
-    assert st.add('asd', 3)
-    assert st.get_unique_items_count() == 5
-    assert st.get_free_space() == 1
-
-    assert st.add('addxx', 1)
-    assert st.get_unique_items_count() == 6
-    assert st.get_free_space() == 0
-
-    assert not st.add('addxx', 4)
-    assert st.get_unique_items_count() == 6
-    assert st.get_free_space() == 0
-
-    assert st.remove('asd', 3)
-    assert st.get_unique_items_count() == 5
-    assert st.get_free_space() == 3
-

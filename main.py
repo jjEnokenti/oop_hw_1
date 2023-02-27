@@ -1,6 +1,6 @@
-from store import Store
-from shop import Shop
-from request_entity import Request
+from entities.store import Store
+from entities.shop import Shop
+from entities.request import Request
 
 
 def main():

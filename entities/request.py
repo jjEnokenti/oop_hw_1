@@ -8,7 +8,6 @@ class Request:
         self.product = self._request[0]
 
 
-
 if __name__ == '__main__':
     req = Request('печенья 3 склад магазин')
     print(req)

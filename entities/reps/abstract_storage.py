@@ -1,7 +1,7 @@
 from abc import ABC, abstractmethod
 
 
-class Storage(ABC):
+class AbstractStorage(ABC):
 
     @abstractmethod
     def add(self, title: str, quantity: int):
