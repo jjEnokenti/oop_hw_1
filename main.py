@@ -1,78 +1,72 @@
+from entities.courier import Courier
 from entities.store import Store
 from entities.shop import Shop
 from entities.request import Request
+from exceptions import IncorrectRequest, BaseError
+
+store_1 = Store(
+    items={
+        'мишка': 40,
+        'машинка': 5,
+        'футболка': 15,
+        'кольцо': 10
+    }
+)
+
+shop_1 = Shop(
+    items={
+        'мишка': 7,
+        'машинка': 1,
+        'футболка': 2
+    }
+)
+
+storages = {
+    'склад': store_1,
+    'магазин': shop_1
+}
 
 
 def main():
     print('Добро пожаловать!')
 
-    store_1 = Store(
-        items={
-            'toy': 40,
-            'car': 5,
-            'shirt': 15,
-            'ring': 10
-        }
-    )
-
-    shop_1 = Shop(
-        items={
-            'toy': 7,
-            'car': 1,
-            'shirt': 2
-        }
-    )
-
     while True:
+        for name, store in storages.items():
+            print(f'Доступные товары ({name}):',
+                  *[f'{item} - {quantity}'
+                    for item, quantity in store.get_items().items()],
+                  sep='\n')
+
         try:
-            print(
-                'Доступные товары на складе:',
-                *[
-                    f'{item} {quantity}'
-                    for item, quantity in store_1.get_items().items()
-                ],
-                sep='\n'
-            )
             user_request = input(
-                'Введите свой запрос в соответствии с данным шаблоном\n'
+                'Если вы желаете остановить программу введите "stop/стоп"\n'
+                'Введите свой запрос в соответствии с данным форматом\n'
                 '"<Наименование товара> <количество> <названия склада> <название магазина>"\n>>>'
             )
-            if user_request in ('stop', 'стоп'):
-                print('Всего доброго!')
-                break
-        except Exception:
-            print('Некорректный запрос, попробуйте еще раз')
+        except BaseError as exc:
+            print(exc.message)
             continue
-        else:
+
+        if user_request in ('stop', 'стоп'):
+            print('Всего доброго!')
+            break
+
+        try:
             request = Request(request=user_request)
-            product = request.product
-            amount = request.amount
-            to = request.to
-            take_from = request.take_from
+        except IncorrectRequest as exc:
+            print(exc.message)
+            continue
 
-            if product not in store_1.get_items():
-                print('Такой товар отсутствует на складе, попробуйте заказать другой')
-                continue
-            if amount > store_1.get_items()[product]:
-                print('Не хватает на складе, попробуйте заказать меньше')
-                continue
-            if not shop_1.add(title=product, quantity=amount):
-                print('В магазин недостаточно места, попробуйте что то другое')
-                continue
+        courier = Courier(
+            request=request,
+            storages=storages
+        )
 
-            print('Нужное количество есть на складе')
-            print(f'Курьер забрал {amount} {product} со {take_from}')
-            print(f'Курьер везет {amount} {product} со {take_from} в {to}')
-            print(f'Курьер доставил {amount} {product} в {to}')
-
-            store_1.remove(title=product, quantity=amount)
-            store_items = [f'{item} {count}' for item, count in store_1.get_items().items()]
-            shop_items = [f'{item} {count}' for item, count in shop_1.get_items().items()]
-
-            print(f'На складе хранится:', *store_items, sep='\n')
-            print(f'В магазине хранится:', *shop_items, sep='\n')
-
-            print('Если вы желаете остановить программу введите "stop/стоп"')
+        try:
+            courier.move()
+        except BaseError as exc:
+            print(exc.message)
+            courier.cancel()
 
 
 if __name__ == '__main__':

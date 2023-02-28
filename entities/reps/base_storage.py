@@ -1,24 +1,24 @@
+from typing import Dict
+
 from entities.reps.abstract_storage import AbstractStorage
+from exceptions import NotEnoughSpace
 
 
 class BaseStorage(AbstractStorage):
 
-    def __init__(self, items: dict, capacity: int):
+    def __init__(self, items: Dict[str, int], capacity: int):
         self._items: dict = items
         self._capacity: int = capacity
 
-    def add(self, title, quantity):
-        if self.get_free_space() == 0:
-            return False
-        if not self.get_free_space() - quantity > 0:
-            quantity = self.get_free_space()
+    def add(self, title: str, quantity: int):
+        if self.get_free_space() == 0 or self.get_free_space() - quantity < 0:
+            raise NotEnoughSpace
 
         self._items[title] = self._items.get(title, 0) + quantity
-        return True
 
-    def remove(self, title, quantity):
-        if quantity <= 0:
-            return False
+    def remove(self, title: str, quantity: int):
+        # if quantity <= 0:
+        #     raise ValueError('Количество должно быть больше нуля')
         current_quantity = self._items[title]
         if quantity > current_quantity:
             quantity = current_quantity
@@ -26,7 +26,6 @@ class BaseStorage(AbstractStorage):
         self._items[title] -= quantity
         if self._items[title] == 0:
             self._items.pop(title)
-        return True
 
     def get_free_space(self):
         curr_space = 0
